@@ -13,3 +13,5 @@ This is an RNG that gives you detailed statistics about the numbers it generates
 
 
 Honestly I was just bored so I made it.
+
+v0.1
