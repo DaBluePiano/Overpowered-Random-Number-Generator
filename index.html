@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random Number Generator with Statistics</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Random Number Generator with Statistics</h1>
+        <div class="input-group">
+            <label for="min">Min:</label>
+            <input type="number" id="min" value="1" min="-100000" max="100000" step="any">
+        </div>
+        <div class="input-group">
+            <label for="max">Max:</label>
+            <input type="number" id="max" value="100" min="-100000" max="100000" step="any">
+        </div>
+        <div class="input-group">
+            <label for="decimals">Decimals:</label>
+            <input type="number" id="decimals" value="0" min="0" max="15">
+        </div>
+        <div class="input-group">
+            <label for="output">Number of Outputs:</label>
+            <input type="number" id="output" value="1" min="1" max="100">
+        </div>
+        <div class="checkbox-group">
+            <label><input type="checkbox" id="median" checked> Median</label>
+            <label><input type="checkbox" id="mode" checked> Mode</label>
+            <label><input type="checkbox" id="mean" checked> Mean</label>
+            <label><input type="checkbox" id="stdDev" checked> Standard Deviation</label>
+            <label><input type="checkbox" id="mad" checked> Mean Absolute Deviation (MAD)</label>
+            <label><input type="checkbox" id="variance" checked> Variance</label>
+            <label><input type="checkbox" id="range" checked> Range</label>
+            <label><input type="checkbox" id="q1" checked> Q1 (25th Percentile)</label>
+            <label><input type="checkbox" id="q3" checked> Q3 (75th Percentile)</label>
+            <label><input type="checkbox" id="iqr" checked> Interquartile Range (IQR)</label>
+        </div>
+        <button onclick="generateRandomNumbers()">Generate</button>
+        <div id="results"></div>
+        <div class="statistics" id="statistics"></div>
+    </div>
+
+    <script>
+        var generatedNumbers = [];
+
+        function generateRandomNumbers() {
+            var min = parseFloat(document.getElementById('min').value);
+            var max = parseFloat(document.getElementById('max').value);
+            var decimals = parseInt(document.getElementById('decimals').value);
+            var numOutputs = parseInt(document.getElementById('output').value);
+
+            var resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+
+            generatedNumbers = [];
+
+            for (var i = 0; i < numOutputs; i++) {
+                var randomNumber = (Math.random() * (max - min) + min).toFixed(decimals);
+                generatedNumbers.push(parseFloat(randomNumber));
+                var resultParagraph = document.createElement('p');
+                resultParagraph.innerText = "Random Number " + (i + 1) + ": " + randomNumber;
+                resultsContainer.appendChild(resultParagraph);
+            }
+
+            displayStatistics();
+        }
+
+        function displayStatistics() {
+            var statisticsContainer = document.getElementById('statistics');
+            statisticsContainer.innerHTML = '';
+
+            var medianCheckbox = document.getElementById('median').checked;
+            var modeCheckbox = document.getElementById('mode').checked;
+            var meanCheckbox = document.getElementById('mean').checked;
+            var stdDevCheckbox = document.getElementById('stdDev').checked;
+            var madCheckbox = document.getElementById('mad').checked;
+            var varianceCheckbox = document.getElementById('variance').checked;
+            var rangeCheckbox = document.getElementById('range').checked;
+            var q1Checkbox = document.getElementById('q1').checked;
+            var q3Checkbox = document.getElementById('q3').checked;
+            var iqrCheckbox = document.getElementById('iqr').checked;
+
+            var statisticsParagraph = document.createElement('p');
+            statisticsParagraph.innerHTML = "<strong>Statistics:</strong><br>";
+
+            if (medianCheckbox) {
+                var median = calculateMedian(generatedNumbers);
+                statisticsParagraph.innerHTML += "Median: " + median + "<br>";
+            }
+            if (modeCheckbox) {
+                var mode = calculateMode(generatedNumbers);
+                statisticsParagraph.innerHTML += "Mode: " + mode + "<br>";
+            }
+            if (meanCheckbox) {
+                var mean = calculateMean(generatedNumbers);
+                statisticsParagraph.innerHTML += "Mean: " + mean + "<br>";
+            }
+            if (stdDevCheckbox) {
+                var stdDev = calculateStandardDeviation(generatedNumbers);
+                statisticsParagraph.innerHTML += "Standard Deviation: " + stdDev + "<br>";
+            }
+            if (madCheckbox) {
+                var mad = calculateMAD(generatedNumbers);
+                statisticsParagraph.innerHTML += "Mean Absolute Deviation (MAD): " + mad + "<br>";
+            }
+            if (varianceCheckbox) {
+                var variance = calculateVariance(generatedNumbers);
+                statisticsParagraph.innerHTML += "Variance: " + variance + "<br>";
+            }
+            if (rangeCheckbox) {
+                var range = calculateRange(generatedNumbers);
+                statisticsParagraph.innerHTML += "Range: " + range + "<br>";
+            }
+            if (q1Checkbox) {
+                var q1 = calculateQuartile(generatedNumbers, 0.25);
+                statisticsParagraph.innerHTML += "Q1 (25th Percentile): " + q1 + "<br>";
+            }
+            if (q3Checkbox) {
+                var q3 = calculateQuartile(generatedNumbers, 0.75);
+                statisticsParagraph.innerHTML += "Q3 (75th Percentile): " + q3 + "<br>";
+            }
+            if (iqrCheckbox) {
+                var q1 = calculateQuartile(generatedNumbers, 0.25);
+                var q3 = calculateQuartile(generatedNumbers, 0.75);
+                var iqr = q3 - q1;
+                statisticsParagraph.innerHTML += "Interquartile Range (IQR): " + iqr + "<br>";
+            }
+
+            statisticsContainer.appendChild(statisticsParagraph);
+        }
+
+        function calculateMedian(numbers) {
+            numbers.sort(function(a, b){return a - b});
+            var middle = Math.floor(numbers.length / 2);
+            if (numbers.length % 2 === 0) {
+                return (numbers[middle - 1] + numbers[middle]) / 2;
+            } else {
+                return numbers[middle];
+            }
+        }
+
+        function calculateMode(numbers) {
+            var modeMap = {};
+            var maxCount = 0;
+            var modes = [];
+
+            numbers.forEach(function(number) {
+                modeMap[number] = (modeMap[number] || 0) + 1;
+                if (modeMap[number] > maxCount) {
+                    maxCount = modeMap[number];
+                    modes = [number];
+                } else if (modeMap[number] === maxCount) {
+                    modes.push(number);
+                }
+            });
+
+            if (modes.length === Object.keys(modeMap).length) {
+                modes = [];
+            }
+
+            return modes.join(", ");
+        }
+
+        function calculateMean(numbers) {
+            var sum = numbers.reduce(function(a, b) {
+                return a + b;
+            }, 0);
+            return sum / numbers.length;
+        }
+
+        function calculateStandardDeviation(numbers) {
+            var mean = calculateMean(numbers);
+            var squaredDifferences = numbers.map(function(number) {
+                return Math.pow(number - mean, 2);
+            });
+            var variance = calculateMean(squaredDifferences);
+            return Math.sqrt(variance);
+        }
+
+        function calculateVariance(numbers) {
+            var mean = calculateMean(numbers);
+            var squaredDifferences = numbers.map(function(number) {
+                return Math.pow(number - mean, 2);
+            });
+            return calculateMean(squaredDifferences);
+        }
+
+        function calculateMAD(numbers) {
+            var mean = calculateMean(numbers);
+            var absoluteDeviations = numbers.map(function(number) {
+                return Math.abs(number - mean);
+            });
+            return calculateMean(absoluteDeviations);
+        }
+
+        function calculateRange(numbers) {
+            var min = Math.min(...numbers);
+            var max = Math.max(...numbers);
+            return max - min;
+        }
+
+        function calculateQuartile(numbers, quartile) {
+            numbers.sort(function(a, b){return a - b});
+            var position = (numbers.length - 1) * quartile;
+            var base = Math.floor(position);
+            var rest = position - base;
+            if ((numbers[base + 1] !== undefined)) {
+                return numbers[base] + rest * (numbers[base + 1] - numbers[base]);
+            } else {
+                return numbers[base];
+            }
+        }
+    </script>
+</body>
+</html>
