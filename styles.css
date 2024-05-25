@@ -1,76 +1,67 @@
 body {
-    background-color: #121212;
-    color: #FFFFFF;
     font-family: 'DM Sans', sans-serif;
+    background-color: #121212;
+    color: #E0E0E0;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    min-height: 100vh;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .container {
-    background-color: #1E1E1E;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 500px;
     width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    background-color: #1E1E1E;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    max-height: 100vh;
 }
 
 h1 {
-    font-size: 24px;
     text-align: center;
-    margin-bottom: 20px;
     color: #4A90E2;
 }
 
-.input-group,
-.checkbox-group {
-    margin-bottom: 15px;
+.input-group, .checkbox-group {
+    margin-bottom: 20px;
 }
 
-.input-group label,
-.checkbox-group label {
+.input-group label, .checkbox-group label {
     display: block;
-    font-weight: 500;
     margin-bottom: 5px;
+    font-weight: 500;
 }
 
-input[type="number"],
-input[type="range"] {
-    width: 100%;
+.input-group input[type="number"], .checkbox-group input[type="checkbox"] {
+    width: calc(100% - 20px);
     padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #333;
-    border-radius: 6
-/* Rest of the CSS */
-.results p, .statistics p {
-    background-color: #252525;
-    padding: 10px;
-    border-radius: 6px;
-    margin: 5px 0;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    outline: none;
 }
 
-.results {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+.input-group input[type="range"] {
+    width: 100%;
+    margin-bottom: 10px;
 }
 
-.statistics p {
-    background-color: #252525;
-    padding: 10px;
-    border-radius: 6px;
-    margin: 5px 0;
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
-.statistics {
-    padding: 20px;
-    border: 2px solid #4A90E2;
-    border-radius: 8px;
-    margin-top: 20px;
-    background-color: #1E1E1E;
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
 }
 
 button {
@@ -85,6 +76,7 @@ button {
     cursor: pointer;
     margin-bottom: 15px;
     transition: background-color 0.3s ease;
+    outline: none;
 }
 
 button:hover {
@@ -107,10 +99,33 @@ button:hover {
     100% { transform: rotate(360deg); }
 }
 
-/* Tooltips */
+.results, .statistics {
+    padding: 20px;
+    border: 2px solid transparent; /* Removed border color */
+    border-radius: 8px;
+    margin-top: 20px;
+    background-color: #1E1E1E;
+    overflow-x: auto;
+    transition: border-color 0.3s;
+}
+
+.results p, .statistics p {
+    background-color: #252525;
+    padding: 10px;
+    border-radius: 6px;
+    margin: 5px 0;
+}
+
+.results {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
 .tooltip {
     position: relative;
     display: inline-block;
+    cursor: pointer;
 }
 
 .tooltip .tooltiptext {
@@ -133,4 +148,32 @@ button:hover {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     opacity: 1;
+}
+
+/* Tooltip descriptions */
+.tooltip-median .tooltiptext::after { content: "The middle value in the list of numbers"; }
+.tooltip-mode .tooltiptext::after { content: "The value that appears most often"; }
+.tooltip-mean .tooltiptext::after { content: "The average of the numbers"; }
+.tooltip-stdDev .tooltiptext::after { content: "The amount of variation or dispersion of the numbers"; }
+.tooltip-mad .tooltiptext::after { content: "Mean Absolute Deviation"; }
+.tooltip-variance .tooltiptext::after { content: "The measure of dispersion between numbers"; }
+.tooltip-range .tooltiptext::after { content: "The difference between the highest and lowest values"; }
+.tooltip-q1 .tooltiptext::after { content: "The first quartile (25th percentile)"; }
+.tooltip-q3 .tooltiptext::after { content: "The third quartile (75th percentile)"; }
+.tooltip-iqr .tooltiptext::after { content: "Interquartile Range"; }
+.tooltip-skewness .tooltiptext::after { content: "Measure of asymmetry"; }
+.tooltip-kurtosis .tooltiptext::after { content: "Measure of the 'tailedness' of the distribution"; }
+.tooltip-geometricMean .tooltiptext::after { content: "The central number in a geometric progression"; }
+.tooltip-harmonicMean .tooltiptext::after { content: "The reciprocal of the average of the reciprocals"; }
+
+@media (max-width: 768px) {
+    .results {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .results {
+        grid-template-columns: 1fr;
+    }
 }
