@@ -1,4 +1,4 @@
-Overpowered Random Number Generator
+**Overpowered Random Number Generator**
 This is an RNG that gives you detailed statistics about the numbers it generates, such as:
 - Mean
 - Mode
@@ -10,8 +10,10 @@ This is an RNG that gives you detailed statistics about the numbers it generates
 - Q1
 - Q3
 - Interquartile Range
-
-
-Honestly I was just bored so I made it.
-
-v0.1
+- Skewness
+- Kurtosis
+- Geometric Mean
+- Harmonic Mean
+ 
+  **v1.1
+  25 May 2024**
