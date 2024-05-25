@@ -4,7 +4,128 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Random Number Generator with Statistics</title>
-<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+    /* Blue Theme and Sleek Styling */
+    body {
+        background-color: #1a202c;
+        color: #e2e8f0;
+        font-family: 'DM Sans', sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .container {
+        max-width: 800px;
+        width: 100%;
+        padding: 20px;
+        background-color: #2d3748;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+        text-align: center;
+        color: #63b3ed;
+        margin-bottom: 20px;
+        font-weight: 700;
+    }
+    .input-group, .checkbox-group, .statistics {
+        margin: 15px 0;
+    }
+    label {
+        display: block;
+        margin: 5px 0;
+        color: #cbd5e0;
+    }
+    input[type="number"], input[type="checkbox"], input[type="range"] {
+        margin-right: 10px;
+    }
+    input[type="number"] {
+        width: calc(100% - 24px);
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 8px;
+        border: 1px solid #4a5568;
+        background-color: #1a202c;
+        color: #e2e8f0;
+        outline: none;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #3182ce;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        color: #e2e8f0;
+        margin-top: 15px;
+    }
+    button:hover {
+        background-color: #2b6cb0;
+    }
+    .results {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+    .results p {
+        width: calc(25% - 10px);
+        margin: 5px;
+        padding: 10px;
+        background-color: #4a5568;
+        border-radius: 8px;
+        text-align: center;
+        color: #e2e8f0;
+    }
+    .statistics p {
+        margin: 5px 0;
+    }
+    .loading-spinner {
+        display: none;
+        border: 8px solid #2d3748;
+        border-top: 8px solid #63b3ed;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .tooltip {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        color: #63b3ed;
+        border-bottom: 1px dotted #63b3ed;
+    }
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #4a5568;
+        color: #e2e8f0;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -100px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+</style>
 </head>
 <body>
     <div class="container">
@@ -23,7 +144,8 @@
         </div>
         <div class="input-group">
             <label for="output">Number of Outputs:</label>
-            <input type="number" id="output" value="1" min="1" max="100">
+            <input type="range" id="outputRange" min="1" max="100" value="1" oninput="updateOutputValue(this.value)">
+            <input type="number" id="output" value="1" min="1" max="100" readonly>
         </div>
         <div class="checkbox-group">
             <label><input type="checkbox" id="median" checked> Median</label>
@@ -36,35 +158,51 @@
             <label><input type="checkbox" id="q1" checked> Q1 (25th Percentile)</label>
             <label><input type="checkbox" id="q3" checked> Q3 (75th Percentile)</label>
             <label><input type="checkbox" id="iqr" checked> Interquartile Range (IQR)</label>
+            <label><input type="checkbox" id="skewness" checked> Skewness</label>
+            <label><input type="checkbox" id="kurtosis" checked> Kurtosis</label>
+            <label><input type="checkbox" id="geometricMean" checked> Geometric Mean</label>
+            <label><input type="checkbox" id="harmonicMean" checked> Harmonic Mean</label>
         </div>
         <button onclick="generateRandomNumbers()">Generate</button>
-        <div id="results"></div>
+        <div class="loading-spinner" id="loadingSpinner"></div>
+        <div class="results" id="results"></div>
         <div class="statistics" id="statistics"></div>
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
     </div>
 
     <script>
         var generatedNumbers = [];
 
+        function updateOutputValue(value) {
+            document.getElementById('output').value = value;
+        }
+
         function generateRandomNumbers() {
-            var min = parseFloat(document.getElementById('min').value);
-            var max = parseFloat(document.getElementById('max').value);
-            var decimals = parseInt(document.getElementById('decimals').value);
-            var numOutputs = parseInt(document.getElementById('output').value);
+            var loadingSpinner = document.getElementById('loadingSpinner');
+            loadingSpinner.style.display = 'block';
 
-            var resultsContainer = document.getElementById('results');
-            resultsContainer.innerHTML = '';
+            setTimeout(function() {
+                var min = parseFloat(document.getElementById('min').value);
+                var max = parseFloat(document.getElementById('max').value);
+                var decimals = parseInt(document.getElementById('decimals').value);
+                var numOutputs = parseInt(document.getElementById('output').value);
 
-            generatedNumbers = [];
+                var resultsContainer = document.getElementById('results');
+                resultsContainer.innerHTML = '';
 
-            for (var i = 0; i < numOutputs; i++) {
-                var randomNumber = (Math.random() * (max - min) + min).toFixed(decimals);
-                generatedNumbers.push(parseFloat(randomNumber));
-                var resultParagraph = document.createElement('p');
-                resultParagraph.innerText = "Random Number " + (i + 1) + ": " + randomNumber;
-                resultsContainer.appendChild(resultParagraph);
-            }
+                generatedNumbers = [];
 
-            displayStatistics();
+                for (var i = 0; i < numOutputs; i++) {
+                    var randomNumber = (Math.random() * (max - min) + min).toFixed(decimals);
+                    generatedNumbers.push(parseFloat(randomNumber));
+                    var resultParagraph = document.createElement('p');
+                    resultParagraph.innerText = randomNumber;
+                    resultsContainer.appendChild(resultParagraph);
+                }
+
+                loadingSpinner.style.display = 'none';
+                displayStatistics();
+            }, 1000);
         }
 
         function displayStatistics() {
@@ -81,9 +219,12 @@
             var q1Checkbox = document.getElementById('q1').checked;
             var q3Checkbox = document.getElementById('q3').checked;
             var iqrCheckbox = document.getElementById('iqr').checked;
+            var skewnessCheckbox = document.getElementById('skewness').checked;
+            var kurtosisCheckbox = document.getElementById('kurtosis').checked;
+            var geometricMeanCheckbox = document.getElementById('geometricMean').checked;
+            var harmonicMeanCheckbox = document.getElementById('harmonicMean').checked;
 
             var statisticsParagraph = document.createElement('p');
-            statisticsParagraph.innerHTML = "<strong>Statistics:</strong><br>";
 
             if (medianCheckbox) {
                 var median = calculateMedian(generatedNumbers);
@@ -122,10 +263,24 @@
                 statisticsParagraph.innerHTML += "Q3 (75th Percentile): " + q3 + "<br>";
             }
             if (iqrCheckbox) {
-                var q1 = calculateQuartile(generatedNumbers, 0.25);
-                var q3 = calculateQuartile(generatedNumbers, 0.75);
-                var iqr = q3 - q1;
+                var iqr = calculateQuartile(generatedNumbers, 0.75) - calculateQuartile(generatedNumbers, 0.25);
                 statisticsParagraph.innerHTML += "Interquartile Range (IQR): " + iqr + "<br>";
+            }
+            if (skewnessCheckbox) {
+                var skewness = calculateSkewness(generatedNumbers);
+                statisticsParagraph.innerHTML += "Skewness: " + skewness + "<br>";
+            }
+            if (kurtosisCheckbox) {
+                var kurtosis = calculateKurtosis(generatedNumbers);
+                statisticsParagraph.innerHTML += "Kurtosis: " + kurtosis + "<br>";
+            }
+            if (geometricMeanCheckbox) {
+                var geometricMean = calculateGeometricMean(generatedNumbers);
+                statisticsParagraph.innerHTML += "Geometric Mean: " + geometricMean + "<br>";
+            }
+            if (harmonicMeanCheckbox) {
+                var harmonicMean = calculateHarmonicMean(generatedNumbers);
+                statisticsParagraph.innerHTML += "Harmonic Mean: " + harmonicMean + "<br>";
             }
 
             statisticsContainer.appendChild(statisticsParagraph);
@@ -179,14 +334,6 @@
             return Math.sqrt(variance);
         }
 
-        function calculateVariance(numbers) {
-            var mean = calculateMean(numbers);
-            var squaredDifferences = numbers.map(function(number) {
-                return Math.pow(number - mean, 2);
-            });
-            return calculateMean(squaredDifferences);
-        }
-
         function calculateMAD(numbers) {
             var mean = calculateMean(numbers);
             var absoluteDeviations = numbers.map(function(number) {
@@ -211,6 +358,61 @@
             } else {
                 return numbers[base];
             }
+        }
+
+        function calculateVariance(numbers) {
+            var mean = calculateMean(numbers);
+            var squaredDifferences = numbers.map(function(number) {
+                return Math.pow(number - mean, 2);
+            });
+            return calculateMean(squaredDifferences);
+        }
+
+        function calculateSkewness(numbers) {
+            var mean = calculateMean(numbers);
+            var variance = calculateVariance(numbers);
+            var stdDev = Math.sqrt(variance);
+            var n = numbers.length;
+            var skewness = numbers.reduce(function (sum, value) {
+                return sum + Math.pow((value - mean) / stdDev, 3);
+            }, 0) / n;
+            return skewness;
+        }
+
+        function calculateKurtosis(numbers) {
+            var mean = calculateMean(numbers);
+            var variance = calculateVariance(numbers);
+            var stdDev = Math.sqrt(variance);
+            var n = numbers.length;
+            var kurtosis = numbers.reduce(function (sum, value) {
+                return sum + Math.pow((value - mean) / stdDev, 4);
+            }, 0) / n;
+            return kurtosis;
+        }
+
+        function calculateGeometricMean(numbers) {
+            var product = numbers.reduce(function (product, value) {
+                return product * value;
+            }, 1);
+            return Math.pow(product, 1 / numbers.length);
+        }
+
+        function calculateHarmonicMean(numbers) {
+            var reciprocalSum = numbers.reduce(function (sum, value) {
+                return sum + (1 / value);
+            }, 0);
+            return numbers.length / reciprocalSum;
+        }
+
+        function copyToClipboard() {
+            var resultsText = generatedNumbers.join("\n");
+            var tempInput = document.createElement("textarea");
+            tempInput.value = resultsText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("Results copied to clipboard!");
         }
     </script>
 </body>
