@@ -3,301 +3,242 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Random Number Generator with Statistics</title>
+<title>Overpowered Random Number Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-    body {
-        font-family: 'DM Sans', sans-serif;
-        background-color: #121212;
-        color: #E0E0E0;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 10px;
-        box-sizing: border-box;
-        overflow: hidden;
-    }
-
-    .container {
-        width: 100%;
-        max-width: 600px;
-        padding: 20px;
-        background-color: #1E1E1E;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        overflow-y: auto;
-        max-height: 100vh;
-    }
-
-    h1 {
-        text-align: center;
-        color: #4A90E2;
-    }
-
-    .input-group, .checkbox-group {
-        margin-bottom: 20px;
-    }
-
-    .input-group label, .checkbox-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 500;
-    }
-
-    .input-group input[type="number"], .checkbox-group input[type="checkbox"] {
-        width: calc(100% - 20px);
-        padding: 8px;
-        border: none;
-        border-radius: 5px;
-        margin-bottom: 10px;
-        box-sizing: border-box;
-        outline: none;
-    }
-
-    .input-group input[type="range"] {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .checkbox-group label {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .checkbox-group input[type="checkbox"] {
-        width: auto;
-        margin-right: 10px;
-    }
-
-    button {
-        width: 100%;
-        padding: 10px;
-        border: none;
-        border-radius: 6px;
-        background-color: #4A90E2;
-        color: #FFF;
-        font-size: 16px;
-        font-weight: 700;
-        cursor: pointer;
-        margin-bottom: 15px;
-        transition: background-color 0.3s ease;
-        outline: none;
-    }
-
-    button:hover {
-        background-color: #357ABD;
-    }
-
-    .loading-spinner {
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-top: 4px solid #4A90E2;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        display: none;
-        margin: 20px auto;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-    .results, .statistics {
-        padding: 20px;
-        border: 2px solid transparent; /* Removed border color */
-        border-radius: 8px;
-        margin-top: 20px;
-        background-color: #1E1E1E;
-        overflow-x: auto;
-        transition: border-color 0.3s;
-    }
-
-    .results p, .statistics p {
-        background-color: #252525;
-        padding: 10px;
-        border-radius: 6px;
-        margin: 5px 0;
-    }
-
-    .results {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-    }
-
-    .tooltip {
-        position: relative;
-        display: inline-block;
-        cursor: pointer;
-    }
-
-    .tooltip .tooltiptext {
-        visibility: hidden;
-        width: 200px;
-        background-color: #4A90E2;
-        color: #fff;
-        text-align: center;
-        padding: 5px;
-        border-radius: 6px;
-        position: absolute;
-        z-index: 1;
-        bottom: 125%;
-        left: 50%;
-        margin-left: -100px;
-        opacity: 0;
-        transition: opacity 0.3s;
-    }
-
-    .tooltip:hover .tooltiptext {
-        visibility: visible;
-        opacity: 1;
-    }
-
-    /* Tooltip descriptions */
-    .tooltip-median .tooltiptext::after { content: "The middle value in the list of numbers"; }
-    .tooltip-mode .tooltiptext::after { content: "The value that appears most often"; }
-    .tooltip-mean .tooltiptext::after { content: "The average of the numbers"; }
-    .tooltip-stdDev .tooltiptext::after { content: "The amount of variation or dispersion of the numbers"; }
-    .tooltip-mad .tooltiptext::after { content: "Mean Absolute Deviation"; }
-    .tooltip-variance .tooltiptext::after { content: "The measure of dispersion between numbers"; }
-    .tooltip-range .tooltiptext::after { content: "The difference between the highest and lowest values"; }
-    .tooltip-q1 .tooltiptext::after { content: "The first quartile (25th percentile)"; }
-    .tooltip-q3 .tooltiptext::after { content: "The third quartile (75th percentile)"; }
-    .tooltip-iqr .tooltiptext::after { content: "Interquartile Range"; }
-    .tooltip-skewness .tooltiptext::after { content: "Measure of asymmetry"; }
-    .tooltip-kurtosis .tooltiptext::after { content: "Measure of the 'tailedness' of the distribution"; }
-    .tooltip-geometricMean .tooltiptext::after { content: "The central tendency of numbers"; }
-    .tooltip-harmonicMean .tooltiptext::after { content: "The reciprocal of the arithmetic mean"; }
-
-    /* Added blue border color for statistics */
-    .statistics {
-        border-color: #4A90E2;
-    }
-
-    /* Added scrollbar styling */
-    ::-webkit-scrollbar {
-        width: 12px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #1E1E1E;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background-color: #4A90E2;
-        border-radius: 10px;
-        border: 3px solid #1E1E1E;
-    }
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="container">
-<h1>Random Number Generator</h1>
-<div class="input-group">
-    <label for="min">Minimum Value:</label>
-    <input type="number" id="min" value="0">
-</div>
-<div class="input-group">
-    <label for="max">Maximum Value:</label>
-    <input type="number" id="max" value="100">
-</div>
-<div class="input-group">
-    <label for="decimals">Decimals:</label>
-    <input type="number" id="decimals" value="2">
-</div>
-<div class="input-group">
-    <label for="output">Number of Outputs:</label>
-    <input type="number" id="output" value="10">
-</div>
-<div class="checkbox-group">
-    <label><input type="checkbox" id="median" checked> <span class="tooltip-median tooltip">Median<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="mode" checked> <span class="tooltip-mode tooltip">Mode<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="mean" checked> <span class="tooltip-mean tooltip">Mean<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="stdDev" checked> <span class="tooltip-stdDev tooltip">Standard Deviation<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="mad" checked> <span class="tooltip-mad tooltip">MAD<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="variance" checked> <span class="tooltip-variance tooltip">Variance<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="range" checked> <span class="tooltip-range tooltip">Range<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="q1" checked> <span class="tooltip-q1 tooltip">Q1<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="q3" checked> <span class="tooltip-q3 tooltip">Q3<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="iqr" checked> <span class="tooltip-iqr tooltip">IQR<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="skewness" checked> <span class="tooltip-skewness tooltip">Skewness<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="kurtosis" checked> <span class="tooltip-kurtosis tooltip">Kurtosis<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="geometricMean" checked> <span class="tooltip-geometricMean tooltip">Geometric Mean<span class="tooltiptext"></span></span></label>
-    <label><input type="checkbox" id="harmonicMean" checked> <span class="tooltip-harmonicMean tooltip">Harmonic Mean<span class="tooltiptext"></span></span></label>
-</div>
-<button onclick="generateRandomNumbers()">Generate</button>
-<div class="loading-spinner" id="loading-spinner"></div>
-<div class="results" id="results"></div>
-<div class="statistics" id="statistics"></div>
-<script>
-    function generateRandomNumbers() {
-        const min = parseFloat(document.getElementById('min').value);
-        const max = parseFloat(document.getElementById('max').value);
-        const decimals = parseInt(document.getElementById('decimals').value);
-        const outputCount = parseInt(document.getElementById('output').value);
+    <div class="container">
+        <h1>Overpowered Random Number Generator</h1>
+        <div class="input-group">
+            <label for="min">Min:</label>
+            <div class="tooltip">
+                <input type="number" id="min" value="1" min="-100000" max="100000" step="any">
+                <span class="tooltiptext">Enter minimum value</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="max">Max:</label>
+            <div class="tooltip">
+                <input type="number" id="max" value="100" min="-100000" max="100000" step="any">
+                <span class="tooltiptext">Enter maximum value</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="decimals">Decimals:</label>
+            <div class="tooltip">
+                <input type="range" id="decimalRange" min="0" max="15" value="0" oninput="updateDecimalValue(this.value)">
+                <input type="number" id="decimals" value="0" min="0" max="15" readonly>
+                <span class="tooltiptext">Select number of decimal places</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="output">Number of Outputs:</label>
+            <div class="tooltip">
+                <input type="range" id="outputRange" min="1" max="100" value="1" oninput="updateOutputValue(this.value)">
+                <input type="number" id="output" value="1" min="1" max="100" readonly>
+                <span class="tooltiptext">Select number of outputs</span>
+            </div>
+        </div>
+        <div class="checkbox-group">
+            <label><input type="checkbox" id="median" checked> Median</label>
+            <label><input type="checkbox" id="mode" checked> Mode</label>
+            <label><input type="checkbox" id="mean" checked> Mean</label>
+            <label><input type="checkbox" id="stdDev" checked> Standard Deviation</label>
+            <label><input type="checkbox" id="mad" checked> Mean Absolute Deviation (MAD)</label>
+            <label><input type="checkbox" id="variance" checked> Variance</label>
+            <label><input type="checkbox" id="range" checked> Range</label>
+            <label><input type="checkbox" id="q1" checked> Q1 (25th Percentile)</label>
+            <label><input type="checkbox" id="q3" checked> Q3 (75th Percentile)</label>
+            <label><input type="checkbox" id="iqr" checked> Interquartile Range (IQR)</label>
+            <label><input type="checkbox" id="skewness" checked> Skewness</label>
+            <label><input type="checkbox" id="kurtosis" checked> Kurtosis</label>
+            <label><input type="checkbox" id="geometricMean" checked> Geometric Mean</label>
+            <label><input type="checkbox" id="harmonicMean" checked> Harmonic Mean</label>
+        </div>
+        <button onclick="generateRandomNumbers()">Generate</button>
+        <div class="loading-spinner" id="loadingSpinner"></div>
+        <div class="results" id="results"></div>
+        <div class="statistics" id="statistics"></div>
+        <button onclick="copyToClipboard('numbers')">Copy Numbers to Clipboard</button>
+        <button onclick="copyToClipboard('statistics')">Copy Statistics to Clipboard</button>
+        <button onclick="copyToClipboard('both')">Copy Both to Clipboard</button>
+    </div>
 
-        const resultsDiv = document.getElementById('results');
-        const statisticsDiv = document.getElementById('statistics');
-        const loadingSpinner = document.getElementById('loading-spinner');
+    <script>
+        let generatedNumbers = [];
 
-        resultsDiv.innerHTML = '';
-        statisticsDiv.innerHTML = '';
-        resultsDiv.style.borderColor = 'transparent';
-        statisticsDiv.style.borderColor = 'transparent';
-        loadingSpinner.style.display = 'block';
+        function updateDecimalValue(value) {
+            document.getElementById('decimals').value = value;
+        }
 
-        setTimeout(() => {
-            const numbers = [];
-            for (let i = 0; i < outputCount; i++) {
-                const randomNumber = (Math.random() * (max - min) + min).toFixed(decimals);
-                numbers.push(parseFloat(randomNumber));
+        function updateOutputValue(value) {
+            document.getElementById('output').value = value;
+        }
+
+        function generateRandomNumbers() {
+            const min = parseFloat(document.getElementById('min').value);
+            const max = parseFloat(document.getElementById('max').value);
+            const decimals = parseInt(document.getElementById('decimals').value);
+            const numOutputs = parseInt(document.getElementById('output').value);
+
+            const resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+            resultsContainer.style.display = 'grid';
+
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            loadingSpinner.style.display = 'block';
+
+            setTimeout(() => {
+                generatedNumbers = [];
+                for (let i = 0; i < numOutputs; i++) {
+                    const randomNum = (Math.random() * (max - min) + min).toFixed(decimals);
+                    generatedNumbers.push(parseFloat(randomNum));
+                    const resultParagraph = document.createElement('p');
+                    resultParagraph.innerText = randomNum;
+                    resultsContainer.appendChild(resultParagraph);
+                }
+
+                displayStatistics();
+                loadingSpinner.style.display = 'none';
+            }, 1000);
+        }
+
+        function displayStatistics() {
+            const statisticsContainer = document.getElementById('statistics');
+            statisticsContainer.innerHTML = '';
+            statisticsContainer.style.display = 'block';
+
+            const statsToDisplay = [
+                { id: 'median', func: calculateMedian, label: 'Median' },
+                { id: 'mode', func: calculateMode, label: 'Mode' },
+                { id: 'mean', func: calculateMean, label: 'Mean' },
+                { id: 'stdDev', func: calculateStdDev, label: 'Standard Deviation' },
+                { id: 'mad', func: calculateMad, label: 'Mean Absolute Deviation (MAD)' },
+                { id: 'variance', func: calculateVariance, label: 'Variance' },
+                { id: 'range', func: calculateRange, label: 'Range' },
+                { id: 'q1', func: calculateQ1, label: 'Q1 (25th Percentile)' },
+                { id: 'q3', func: calculateQ3, label: 'Q3 (75th Percentile)' },
+                { id: 'iqr', func: calculateIqr, label: 'Interquartile Range (IQR)' },
+                { id: 'skewness', func: calculateSkewness, label: 'Skewness' },
+                { id: 'kurtosis', func: calculateKurtosis, label: 'Kurtosis' },
+                { id: 'geometricMean', func: calculateGeometricMean, label: 'Geometric Mean' },
+                { id: 'harmonicMean', func: calculateHarmonicMean, label: 'Harmonic Mean' },
+            ];
+
+            statsToDisplay.forEach(stat => {
+                if (document.getElementById(stat.id).checked) {
+                    const statValue = stat.func(generatedNumbers);
+                    const statParagraph = document.createElement('p');
+                    statParagraph.innerText = `${stat.label}: ${statValue}`;
+                    statisticsContainer.appendChild(statParagraph);
+                }
+            });
+        }
+
+        function calculateMedian(arr) {
+            arr.sort((a, b) => a - b);
+            const mid = Math.floor(arr.length / 2);
+            return arr.length % 2 !== 0 ? arr[mid] : ((arr[mid - 1] + arr[mid]) / 2).toFixed(2);
+        }
+
+        function calculateMode(arr) {
+            const freqMap = {};
+            arr.forEach(num => freqMap[num] = (freqMap[num] || 0) + 1);
+            const maxFreq = Math.max(...Object.values(freqMap));
+            const modes = Object.keys(freqMap).filter(num => freqMap[num] === maxFreq);
+            return modes.length === arr.length ? 'No mode' : modes.join(', ');
+        }
+
+        function calculateMean(arr) {
+            const sum = arr.reduce((acc, num) => acc + num, 0);
+            return (sum / arr.length).toFixed(2);
+        }
+
+        function calculateStdDev(arr) {
+            const mean = calculateMean(arr);
+            const variance = calculateVariance(arr);
+            return Math.sqrt(variance).toFixed(2);
+        }
+
+        function calculateMad(arr) {
+            const mean = calculateMean(arr);
+            const mad = arr.reduce((acc, num) => acc + Math.abs(num - mean), 0) / arr.length;
+            return mad.toFixed(2);
+        }
+
+        function calculateVariance(arr) {
+            const mean = calculateMean(arr);
+            const variance = arr.reduce((acc, num) => acc + Math.pow(num - mean, 2), 0) / arr.length;
+            return variance.toFixed(2);
+        }
+
+        function calculateRange(arr) {
+            return (Math.max(...arr) - Math.min(...arr)).toFixed(2);
+        }
+
+        function calculateQ1(arr) {
+            arr.sort((a, b) => a - b);
+            const q1Pos = (arr.length + 1) / 4;
+            if (q1Pos % 1 === 0) return arr[q1Pos - 1].toFixed(2);
+            const lower = arr[Math.floor(q1Pos) - 1];
+            const upper = arr[Math.ceil(q1Pos) - 1];
+            return ((lower + upper) / 2).toFixed(2);
+        }
+
+        function calculateQ3(arr) {
+            arr.sort((a, b) => a - b);
+            const q3Pos = (3 * (arr.length + 1)) / 4;
+            if (q3Pos % 1 === 0) return arr[q3Pos - 1].toFixed(2);
+            const lower = arr[Math.floor(q3Pos) - 1];
+            const upper = arr[Math.ceil(q3Pos) - 1];
+            return ((lower + upper) / 2).toFixed(2);
+        }
+
+        function calculateIqr(arr) {
+            return (calculateQ3(arr) - calculateQ1(arr)).toFixed(2);
+        }
+
+        function calculateSkewness(arr) {
+            const mean = calculateMean(arr);
+            const stdDev = calculateStdDev(arr);
+            const skewness = arr.reduce((acc, num) => acc + Math.pow((num - mean) / stdDev, 3), 0) / arr.length;
+            return skewness.toFixed(2);
+        }
+
+        function calculateKurtosis(arr) {
+            const mean = calculateMean(arr);
+            const stdDev = calculateStdDev(arr);
+            const kurtosis = arr.reduce((acc, num) => acc + Math.pow((num - mean) / stdDev, 4), 0) / arr.length;
+            return (kurtosis - 3).toFixed(2);
+        }
+
+        function calculateGeometricMean(arr) {
+            const product = arr.reduce((acc, num) => acc * num, 1);
+            return Math.pow(product, 1 / arr.length).toFixed(2);
+        }
+
+        function calculateHarmonicMean(arr) {
+            const harmonicSum = arr.reduce((acc, num) => acc + (1 / num), 0);
+            return (arr.length / harmonicSum).toFixed(2);
+        }
+
+        function copyToClipboard(type) {
+            let textToCopy = '';
+            if (type === 'numbers' || type === 'both') {
+                textToCopy += 'Generated Numbers:\n' + generatedNumbers.join('\n') + '\n\n';
+            }
+            if (type === 'statistics' || type === 'both') {
+                const statisticsText = Array.from(document.getElementById('statistics').children).map(p => p.innerText).join('\n');
+                textToCopy += 'Statistics:\n' + statisticsText;
             }
 
-            resultsDiv.style.borderColor = '#4A90E2';
-            statisticsDiv.style.borderColor = '#4A90E2';
-
-            numbers.forEach(number => {
-                resultsDiv.innerHTML += `<p>${number}</p>`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                alert('Copied to clipboard');
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
             });
-
-            displayStatistics(numbers);
-
-            loadingSpinner.style.display = 'none';
-        }, 1000);
-    }
-
-    function displayStatistics(numbers) {
-        const statisticsDiv = document.getElementById('statistics');
-
-        if (document.getElementById('median').checked) {
-            const median = calculateMedian(numbers);
-            statisticsDiv.innerHTML += `<p><span class="tooltip-median tooltip">Median<span class="tooltiptext">${median}</span></span></p>`;
         }
-
-        if (document.getElementById('mode').checked) {
-            const mode = calculateMode(numbers);
-            statisticsDiv.innerHTML += `<p><span class="tooltip-mode tooltip">Mode<span class="tooltiptext">${mode}</span></span></p>`;
-        }
-
-        if (document.getElementById('mean').checked) {
-            const mean = calculateMean(numbers);
-            statisticsDiv.innerHTML += `<p><span class="tooltip-mean tooltip">Mean<span class="tooltiptext">${mean}</span></span></p>`;
-        }
-
-        if (document.getElementById('stdDev').checked) {
-            const stdDev = calculateStdDev(numbers);
-            statisticsDiv.innerHTML += `<p><span class="tooltip-stdDev tooltip">Standard Deviation<span class="tooltiptext">${stdDev}</span></span></p>`;
-        }
-
-        if (document.getElementById('mad').checked) {
-            const mad = calculateMAD(numbers);
-            statisticsDiv.innerHTML += `<p><span class="tooltip-mad tooltip">MAD<span class="tooltiptext">${mad}</span></span></p>`;
-        }
-
-        if (document.getElementById('variance').checked) {
-            const variance = calculateVariance(numbers
+    </script>
+</body>
+</html>
