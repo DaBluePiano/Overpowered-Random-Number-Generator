@@ -1,4 +1,4 @@
-**Overpowered Random Number Generator**
+Branch: **Overpowered Random Number Generator**
 This is an RNG that gives you detailed statistics about the numbers it generates, such as:
 - Mean
 - Mode
