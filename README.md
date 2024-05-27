@@ -15,5 +15,5 @@ This is an RNG that gives you detailed statistics about the numbers it generates
 - Geometric Mean
 - Harmonic Mean
  
-  **v1.1
-  25 May 2024**
+  **v2.1
+  27 May 2024**
