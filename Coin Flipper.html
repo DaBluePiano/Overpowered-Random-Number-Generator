@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coin Flipper</title>
+<style>
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #000; /* Black theme */
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .container {
+    background-color: #1f1f1f; /* Secondary blue */
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    text-align: center;
+    overflow-y: auto;
+    max-height: 90vh;
+    width: 90%;
+    max-width: 500px;
+  }
+  #coin {
+    width: 200px;
+    height: 200px;
+    margin: 50px auto;
+    position: relative;
+  }
+  #coin img {
+    width: 100%;
+    height: 100%;
+  }
+  #coin.flip {
+    animation: flip 1s forwards;
+  }
+  @keyframes flip {
+    0% {
+      transform: rotateY(0deg);
+    }
+    50% {
+      transform: rotateY(180deg);
+    }
+    100% {
+      transform: rotateY(360deg);
+    }
+  }
+  button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #45a049;
+  }
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  li {
+    margin-bottom: 5px;
+    padding: 10px;
+    background-color: #2c2c2c;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    display: inline-block;
+  }
+  .chart-container {
+    width: 300px;
+    margin: 20px auto;
+  }
+  .bar {
+    display: inline-block;
+    width: 20px;
+    margin-right: 10px;
+    background-color: #3498db;
+    vertical-align: bottom;
+  }
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #1f1f1f; /* Secondary blue */
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+  /* Styled slider */
+  .slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    background: #ccc;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+  }
+  .slider:hover {
+    opacity: 1;
+  }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #3498db; /* Secondary blue */
+    cursor: pointer;
+  }
+  .slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #3498db; /* Secondary blue */
+    cursor: pointer;
+  }
+  /* Styled input box */
+  input[type="number"] {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-left: 10px;
+    text-align: center;
+    background-color: #444; /* Grey background */
+    color: #fff; /* Text color */
+  }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap">
+</head>
+<body>
+
+<div class="container">
+  <h1>Coin Flipper</h1>
+  <div>
+    <label for="numFlips">Number of Flips: <span id="numFlipsValue">1</span></label>
+    <input type="range" min="1" max="10000" value="1" class="slider" id="numFlips">
+    <input type="number" min="1" value="1" id="numFlipsInput">
+  </div>
+  <div id="coin">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/1_Indian_rupee_coin_%282018%29.png/220px-1_Indian_rupee_coin_%282018%29.png" alt="Coin">
+  </div>
+  <button onclick="flipCoins()">Flip Coin(s)</button>
+  <ul id="results"></ul>
+  <div id="stats" class="chart-container"></div>
+</div>
+
+<script>
+  const numFlipsInput = document.getElementById('numFlips');
+  const numFlipsValue = document.getElementById('numFlipsValue');
+  const numFlipsInputBox = document.getElementById('numFlipsInput');
+  
+  numFlipsInput.addEventListener('input', function() {
+    numFlipsValue.textContent = this.value;
+    numFlipsInputBox.value = this.value;
+  });
+  
+  numFlipsInputBox.addEventListener('input', function() {
+    numFlipsValue.textContent = this.value;
+    numFlipsInput.value = this.value;
+  });
+
+  function flipCoins() {
+    const coin = document.getElementById('coin');
+    const resultsList = document.getElementById('results');
+    const statsDiv = document.getElementById('stats');
+    const numFlips = parseInt(document.getElementById('numFlips').value);
+    let numHeads = 0;
+    let numTails = 0;
+
+    resultsList.innerHTML = ''; // Clear previous results
+    statsDiv.innerHTML = ''; // Clear previous stats
+
+    let results = [];
+
+    for (let i = 0; i < numFlips; i++) {
+      const result = Math.random() < 0.5 ? 'H' : 'T'; // Using 'H
+      results.push(result);
+      if (result === 'H') { // Capitalized
+        numHeads++;
+      } else {
+        numTails++;
+      }
+    }
+
+    // Add results to session storage
+    sessionStorage.setItem('results', JSON.stringify(results));
+
+    // Add results to list
+    results.forEach(result => {
+      const li = document.createElement('li');
+      li.textContent = result;
+      resultsList.appendChild(li);
+    });
+
+    // Update stats
+    displayStats(numHeads, numTails, numFlips);
+  }
+
+  function displayStats(numHeads, numTails, numFlips) {
+    const statsDiv = document.getElementById('stats');
+    const theoreticalProbability = 50; // 50% for each outcome
+    const experimentalProbability = (numHeads / numFlips) * 100;
+
+    const statsHeading = document.createElement('h2');
+    statsHeading.textContent = 'Statistics';
+    statsDiv.appendChild(statsHeading);
+
+    const headsBar = document.createElement('div');
+    headsBar.classList.add('bar');
+    headsBar.style.height = `${experimentalProbability}%`;
+
+    const statsExplanation = document.createElement('p');
+    statsExplanation.innerHTML = `
+      Heads (H): ${numHeads} (${experimentalProbability.toFixed(2)}%)<br>
+      Tails (T): ${numTails} (${(100 - experimentalProbability).toFixed(2)}%)<br>
+      Theoretical Probability: ${theoreticalProbability}%<br>
+      Difference: ${Math.abs(theoreticalProbability - experimentalProbability).toFixed(2)}%
+    `;
+
+    statsDiv.appendChild(headsBar);
+    statsDiv.appendChild(statsExplanation);
+  }
+</script>
+
+</body>
+</html>
